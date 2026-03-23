@@ -1,4 +1,5 @@
 import { roundTo } from "./utils.ts";
+import { gcdEuclid } from "./gcd.ts";
 
 export class Fraction {
   constructor(
@@ -7,6 +8,15 @@ export class Fraction {
   ) {
     if (denominator === 0) {
       throw new Error("denominator must not be 0");
+    }
+
+    const gcd = gcdEuclid(Math.abs(numerator), Math.abs(denominator));
+    this.numerator = numerator / gcd;
+    this.denominator = denominator / gcd;
+
+    if (this.denominator < 0) {
+      this.numerator = -this.numerator;
+      this.denominator = -this.denominator;
     }
   }
 
@@ -34,6 +44,14 @@ export class Fraction {
     const newNumerator = this.numerator * other.denominator;
     const newDenominator = this.denominator * other.numerator;
     return new Fraction(newNumerator, newDenominator);
+  }
+
+  public cancel(): Fraction {
+    const gcd = gcdEuclid(
+      Math.abs(this.numerator),
+      Math.abs(this.denominator),
+    );
+    return new Fraction(this.numerator / gcd, this.denominator / gcd);
   }
 
   public toFloat(precision: number): number {

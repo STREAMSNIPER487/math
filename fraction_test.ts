@@ -38,7 +38,7 @@ Deno.test("1/3 + 2/6 = 2/3 is roughly 0.67", () => {
   // Assert
   assertAlmostEquals(result.toFloat(0.01), 0.67);
   assertEquals(left.toString(), "1/3");
-  assertEquals(right.toString(), "2/6");
+  assertEquals(right.toString(), "1/3");
 });
 
 Deno.test("subtraction does not mutate operands", () => {
@@ -47,7 +47,7 @@ Deno.test("subtraction does not mutate operands", () => {
 
   const result = left.subtract(right);
 
-  assertEquals(result.toString(), "24/36");
+  assertEquals(result.toString(), "2/3");
   assertEquals(left.toString(), "5/6");
   assertEquals(right.toString(), "1/6");
 });
@@ -58,7 +58,7 @@ Deno.test("multiplication does not mutate operands", () => {
 
   const result = left.multiply(right);
 
-  assertEquals(result.toString(), "6/12");
+  assertEquals(result.toString(), "1/2");
   assertEquals(left.toString(), "2/3");
   assertEquals(right.toString(), "3/4");
 });
@@ -69,7 +69,7 @@ Deno.test("division does not mutate operands", () => {
 
   const result = left.divide(right);
 
-  assertEquals(result.toString(), "10/12");
+  assertEquals(result.toString(), "5/6");
   assertEquals(left.toString(), "2/3");
   assertEquals(right.toString(), "4/5");
 });
@@ -123,3 +123,44 @@ Deno.test("division by zero fraction throws", () => {
     "denominator must not be 0",
   );
 });
+
+Deno.test("cancel keeps 1/1 unchanged", () => {
+  const fraction = new Fraction(1, 1);
+
+  const cancelled = fraction.cancel();
+
+  assertEquals(cancelled.toString(), "1/1");
+  assertEquals(fraction.toString(), "1/1");
+});
+
+Deno.test("cancel reduces 2/4 to 1/2", () => {
+  const fraction = new Fraction(2, 4);
+
+  const cancelled = fraction.cancel();
+
+  assertEquals(cancelled.toString(), "1/2");
+  assertEquals(fraction.toString(), "1/2");
+});
+
+Deno.test("constructor reduces fractions automatically", () => {
+  const fraction = new Fraction(2, 4);
+
+  assertEquals(fraction.toString(), "1/2");
+});
+
+Deno.test("parse reduces fractions automatically", () => {
+  const fraction = Fraction.parse("10 / 20");
+
+  assertEquals(fraction.toString(), "1/2");
+});
+
+Deno.test("add returns reduced result automatically", () => {
+  const left = new Fraction(1, 6);
+  const right = new Fraction(1, 6);
+
+  const result = left.add(right);
+
+  assertEquals(result.toString(), "1/3");
+});
+
+
